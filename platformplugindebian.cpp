@@ -1,6 +1,6 @@
 #include "platformplugindebian.h"
 #include "debiansystemcontroller.h"
-#include "debianupdatecontroller.h"
+#include "debian<updatecontroller.h"
 
 PlatformPluginDebian::PlatformPluginDebian(QObject *parent): PlatformPlugin(parent)
 {
