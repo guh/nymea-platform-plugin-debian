@@ -30,6 +30,14 @@ bool DebianLinuxSystemController::powerManagementAvailable() const
 bool DebianLinuxSystemController::reboot()
 {
     qCDebug(dcPlatform) << "Rebooting";
+    QDBusInterface logind("org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", QDBusConnection::systemBus());
+    QDBusPendingReply<> powerOff = logind.callWithArgumentList(QDBus::Block, "Reboot", {true, });
+    powerOff.waitForFinished();
+    if (powerOff.isError()) {
+        const auto error = powerOff.error();
+        qCWarning(dcPlatform) << "Error calling reboot on logind.";
+        return false;
+    }
     return true;
 }
 

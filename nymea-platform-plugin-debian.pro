@@ -4,6 +4,9 @@ QT += network dbus
 TARGET = nymea_platformplugindebian-linux
 TEMPLATE = lib
 
+CONFIG += link_pkgconfig
+PKGCONFIG += nymea
+
 DEFINES += DEBIANLINUX_LIBRARY
 
 SOURCES += \
@@ -17,7 +20,6 @@ HEADERS += \
     debianlinuxsystemcontroller.h \
     debianlinuxupdatecontroller.h \
 
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
+
+target.path = $$[QT_INSTALL_LIBS]/nymea/platforms/
+INSTALLS += target
