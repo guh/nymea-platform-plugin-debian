@@ -1,5 +1,5 @@
-#ifndef DEBIANLINUXUPDATECONTROLLER_H
-#define DEBIANLINUXUPDATECONTROLLER_H
+#ifndef DEBIANUPDATECONTROLLER_H
+#define DEBIANUPDATECONTROLLER_H
 
 #include <QObject>
 #include <QProcess>
@@ -7,11 +7,11 @@
 
 #include "platform/platformupdatecontroller.h"
 
-class DebianLinuxUpdateController : public PlatformUpdateController
+class DebianUpdateController : public PlatformUpdateController
 {
     Q_OBJECT
 public:
-    explicit DebianLinuxUpdateController(QObject *parent = nullptr);
+    explicit DebianUpdateController(QObject *parent = nullptr);
 
     bool updateManagementAvailable() override;
     virtual QString currentVersion() const override;

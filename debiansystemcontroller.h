@@ -1,15 +1,15 @@
-#ifndef DEBIANLINUXSYSTEMCONTROLLER_H
-#define DEBIANLINUXSYSTEMCONTROLLER_H
+#ifndef DEBIANSYSTEMCONTROLLER_H
+#define DEBIANSYSTEMCONTROLLER_H
 
 #include <QObject>
 
 #include "platform/platformsystemcontroller.h"
 
-class DebianLinuxSystemController : public PlatformSystemController
+class DebianSystemController : public PlatformSystemController
 {
     Q_OBJECT
 public:
-    explicit DebianLinuxSystemController(QObject *parent = nullptr);
+    explicit DebianSystemController(QObject *parent = nullptr);
 
     bool powerManagementAvailable() const override;
 

@@ -1,66 +1,66 @@
-#include "debianlinuxupdatecontroller.h"
+#include "debianupdatecontroller.h"
 #include "loggingcategories.h"
 
 #include <QProcess>
 #include <QTimer>
 
-DebianLinuxUpdateController::DebianLinuxUpdateController(QObject *parent):
+DebianUpdateController::DebianUpdateController(QObject *parent):
     PlatformUpdateController(parent)
 {
     checkForUpdates();
     QTimer *refreshTimer = new QTimer(this);
-    connect(refreshTimer, &QTimer::timeout, this, &DebianLinuxUpdateController::checkForUpdates);
+    connect(refreshTimer, &QTimer::timeout, this, &DebianUpdateController::checkForUpdates);
     refreshTimer->start(1000 * 60 * 60);
 }
 
-bool DebianLinuxUpdateController::updateManagementAvailable()
+bool DebianUpdateController::updateManagementAvailable()
 {
     return true;
 }
 
-QString DebianLinuxUpdateController::currentVersion() const
+QString DebianUpdateController::currentVersion() const
 {
     return m_installedVersion;
 }
 
-QString DebianLinuxUpdateController::candidateVersion() const
+QString DebianUpdateController::candidateVersion() const
 {
     return m_candidateVersion;
 }
 
-void DebianLinuxUpdateController::checkForUpdates()
+void DebianUpdateController::checkForUpdates()
 {
     enqueueJob("apt-get update", SLOT(aptUpdateFinished(int)));
     enqueueJob("apt-cache policy nymea", SLOT(aptCachePolicyFinished(int)));
 }
 
-bool DebianLinuxUpdateController::updateAvailable() const
+bool DebianUpdateController::updateAvailable() const
 {
     return m_installedVersion != m_candidateVersion;
 }
 
-bool DebianLinuxUpdateController::startUpdate()
+bool DebianUpdateController::startUpdate()
 {
     enqueueJob("apt-get --yes dist-upgrade", SLOT(aptUpgradeFinished(int)));
     checkForUpdates();
 }
 
-bool DebianLinuxUpdateController::updateInProgress() const
+bool DebianUpdateController::updateInProgress() const
 {
     return m_apt != nullptr;
 }
 
-QStringList DebianLinuxUpdateController::availableChannels() const
+QStringList DebianUpdateController::availableChannels() const
 {
     return {"stable", "candidate"};
 }
 
-QString DebianLinuxUpdateController::currentChannel() const
+QString DebianUpdateController::currentChannel() const
 {
     return m_currentChannel;
 }
 
-bool DebianLinuxUpdateController::selectChannel(const QString &channel)
+bool DebianUpdateController::selectChannel(const QString &channel)
 {
     if (channel == m_currentChannel) {
         return true;
@@ -80,19 +80,19 @@ bool DebianLinuxUpdateController::selectChannel(const QString &channel)
     return true;
 }
 
-void DebianLinuxUpdateController::enqueueJob(const QString &command, const QString &finishedSlot)
+void DebianUpdateController::enqueueJob(const QString &command, const QString &finishedSlot)
 {
     m_jobQueue.append(Job(command.split(" "), finishedSlot));
     processQueue();
 }
 
-void DebianLinuxUpdateController::enqueueJob(const QStringList &command, const QString &finishedSlot)
+void DebianUpdateController::enqueueJob(const QStringList &command, const QString &finishedSlot)
 {
     m_jobQueue.append(Job(command, finishedSlot));
     processQueue();
 }
 
-void DebianLinuxUpdateController::processQueue()
+void DebianUpdateController::processQueue()
 {
     if (m_apt) {
         // busy...
@@ -133,7 +133,7 @@ void DebianLinuxUpdateController::processQueue()
         case 100:
             qCWarning(dcPlatform) << "Failed to obtain dpkg lock. Waiting 5 seconds...";
             qCWarning(dcPlatform) << qUtf8Printable(stdErr);
-            QTimer::singleShot(5000, this, &DebianLinuxUpdateController::processQueue);
+            QTimer::singleShot(5000, this, &DebianUpdateController::processQueue);
             break;
         default:
             qCWarning(dcPlatform) << "Unhandled apt error:" << exitCode;
@@ -146,7 +146,7 @@ void DebianLinuxUpdateController::processQueue()
     m_apt->start(commandWithArgs.takeFirst(), commandWithArgs);
 }
 
-void DebianLinuxUpdateController::aptUpdateFinished(int exitCode)
+void DebianUpdateController::aptUpdateFinished(int exitCode)
 {
     if (exitCode != 0) {
         qCWarning(dcPlatform) << "apt-get update failed with status code:" << exitCode;
@@ -158,7 +158,7 @@ void DebianLinuxUpdateController::aptUpdateFinished(int exitCode)
     qCDebug(dcPlatform) << stdOut;
 }
 
-void DebianLinuxUpdateController::aptCachePolicyFinished(int exitCode)
+void DebianUpdateController::aptCachePolicyFinished(int exitCode)
 {
     if (exitCode != 0) {
         return;
@@ -212,7 +212,7 @@ void DebianLinuxUpdateController::aptCachePolicyFinished(int exitCode)
     }
 }
 
-void DebianLinuxUpdateController::aptUpgradeFinished(int exitCode)
+void DebianUpdateController::aptUpgradeFinished(int exitCode)
 {
     if (exitCode != 0) {
         return;
@@ -220,22 +220,22 @@ void DebianLinuxUpdateController::aptUpgradeFinished(int exitCode)
     qCDebug(dcPlatform) << "apt-get upgrade finished with success";
 }
 
-void DebianLinuxUpdateController::aptAddRepoFinished(int exitCode)
+void DebianUpdateController::aptAddRepoFinished(int exitCode)
 {
     qCDebug(dcPlatform) << "apt-add-repository finished" << m_apt->readAllStandardOutput();
 }
 
-void DebianLinuxUpdateController::aptRemoveFinished(int exitCode)
+void DebianUpdateController::aptRemoveFinished(int exitCode)
 {
     qCDebug(dcPlatform) << "apt-get remove nymea finished";
 }
 
-void DebianLinuxUpdateController::aptInstallFinished(int exitCode)
+void DebianUpdateController::aptInstallFinished(int exitCode)
 {
     qCDebug(dcPlatform) << "apt-get install nymea finished";
 }
 
-void DebianLinuxUpdateController::fetchPluginsFinished(int exitCode)
+void DebianUpdateController::fetchPluginsFinished(int exitCode)
 {
     if (exitCode != 0) {
         qCWarning(dcPlatform) << "Error reading plugins. Aborting upgrade";
@@ -254,7 +254,7 @@ void DebianLinuxUpdateController::fetchPluginsFinished(int exitCode)
     }
 }
 
-void DebianLinuxUpdateController::installPluginFinished(int exitCode)
+void DebianUpdateController::installPluginFinished(int exitCode)
 {
     qCDebug(dcPlatform) << "Plugin installation" << (exitCode == 0 ? "succeeded" : "failed");
 }
