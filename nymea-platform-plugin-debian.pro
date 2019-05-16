@@ -4,7 +4,7 @@ QT += network dbus
 TARGET = nymea_platformplugindebian
 TEMPLATE = lib
 
-CONFIG += link_pkgconfig
+CONFIG += link_pkgconfig c++11
 PKGCONFIG += nymea
 
 DEFINES += DEBIANLINUX_LIBRARY
